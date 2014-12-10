@@ -63,6 +63,12 @@ describe('treeControl', function() {
             expect($rootScope.selected).toBeDefined();
         });
 
+        it('should retain selected node when dblclicked', function () {
+            element.find('li:eq(0) div').dblclick();
+            expect(element.find('li:eq(0) div').hasClass('tree-selected')).toBeTruthy();
+            expect($rootScope.selected).toBeDefined();
+        });
+
         it('should transclude tree labels', function () {
             expect(element.find('li:eq(0) span').text()).toBe('node 1');
             expect(element.find('li:eq(1) span').text()).toBe('node 4');
@@ -223,6 +229,16 @@ describe('treeControl', function() {
             expect($rootScope.itemSelected).toHaveBeenCalledWith('node 1');
         });
 
+        it('should invoke on-dbl-click callback when item is selected', function () {
+            $rootScope.treedata = createSubTree(2, 2);
+            element = $compile('<treecontrol tree-model="treedata" on-dbl-click="itemSelected(node.label)">{{node.label}}</treecontrol>')($rootScope);
+            $rootScope.$digest();
+
+            $rootScope.itemSelected = jasmine.createSpy('itemSelected');
+            element.find('li:eq(0) div').dblclick();
+            expect($rootScope.itemSelected).toHaveBeenCalledWith('node 1');
+        });
+
         it('should call on-selection callback on item unselection with undefined node', function () {
             $rootScope.treedata = createSubTree(2, 2);
             element = $compile('<treecontrol tree-model="treedata" on-selection="itemSelected(node)">{{node.label}}</treecontrol>')($rootScope);
@@ -236,7 +252,7 @@ describe('treeControl', function() {
             expect($rootScope.itemSelected.calls.length).toBe(2);
         });
 
-        it('should un-select a node after second click', function () {
+        it('should un-select a node after second single click', function () {
             $rootScope.treedata = createSubTree(2, 2);
             $rootScope.selectedItem = $rootScope.treedata[0];
             element = $compile('<treecontrol tree-model="treedata" selected-node="selectedItem">{{node.label}}</treecontrol>')($rootScope);
